@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class CNN(tf.keras.Model):
     def __init__(self, input_shape, output_classes):
         super(CNN, self).__init__()
