@@ -3,7 +3,7 @@ import tensorflow as tf
 
 class CNN(tf.keras.Model):
     def __init__(self, input_shape, output_classes):
-        super(CNN, self).__init__()
+        super().__init__()
         self.network = tf.keras.Sequential([
             tf.keras.layers.InputLayer(input_shape=input_shape),
             tf.keras.layers.Conv2D(16, 3, strides=2, padding="same", activation="relu"),
