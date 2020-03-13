@@ -11,7 +11,7 @@ class CNN(tf.keras.Model):
             tf.keras.layers.Conv2D(64, 3, strides=2, padding="same", activation="relu"),
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.Dense(output_classes)
+            tf.keras.layers.Dense(output_classes, activation="softmax")
         ])
 
     def call(self, inputs):

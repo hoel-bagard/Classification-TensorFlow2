@@ -3,8 +3,6 @@ import time
 import tensorflow as tf
 
 from src.dataset.mnist import MNISTDatasetCreator
-from config.data_config import DataConfig
-from src.utils.tensorboard import TensorBoard
 
 
 class Trainer:
@@ -24,8 +22,6 @@ class Trainer:
         self.val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy(name="train_acc")
 
         self.steps_per_epoch = dataset.train_dataset_size // dataset.batch_size
-        if DataConfig.USE_TB:
-            self.tensorboard = TensorBoard(model, dataset.input_shape)
 
     @tf.function
     def train_step(self, x, y_true):
@@ -53,7 +49,7 @@ class Trainer:
         return self.train_loss_metric.result(), self.train_acc_metric.result()
 
     def val_step(self, x, y_true):
-        y_pred = self.model.predict(x)
+        y_pred = tf.convert_to_tensor(self.model.predict(x))
         loss = self.loss_fn(y_true, y_pred)
         self.val_loss_metric.update_state(loss)
         self.val_acc_metric.update_state(y_true, y_pred)

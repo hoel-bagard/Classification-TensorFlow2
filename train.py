@@ -17,9 +17,6 @@ def main():
     parser.add_argument("--pickle", action="store_true", help="Loads / stores data to pickle for faster loading")
     args = parser.parse_args()
 
-    if args.pickle:
-        print("Not implemented yet")
-
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
     for physical_device in physical_devices:
@@ -49,7 +46,8 @@ def main():
             shutil.copy(misc_file, os.path.join(output_folder, misc_file))
         print("Finished copying files")
 
-    mnist_dataset = MNISTDatasetCreator(DataConfig.DATA_PATH, batch_size=ModelConfig.BATCH_SIZE, cache=True)
+    mnist_dataset = MNISTDatasetCreator(DataConfig.DATA_PATH, batch_size=ModelConfig.BATCH_SIZE,
+                                        cache=True, pickle=args.pickle)
 
     model = CNN(mnist_dataset.input_shape, 10)
     model.build((None, *mnist_dataset.input_shape))
