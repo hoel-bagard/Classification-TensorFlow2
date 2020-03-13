@@ -16,7 +16,13 @@ def train(model: tf.keras.Model, dataset: MNISTDatasetCreator, max_epoch=50):
     trainer = Trainer(model, optimizer, loss_fn, dataset)
 
     if DataConfig.USE_TB:
-        tensorboard = TensorBoard(model, dataset.input_shape, tb_dir=DataConfig.TB_DIR)
+        tensorboard = TensorBoard(tb_dir=DataConfig.TB_DIR)
+        # Creates the TensorBoard Graph. The result is not great, but it's a start.
+        tf.summary.trace_on(graph=True, profiler=False)
+        trainer.val_step(tf.expand_dims(tf.zeros(dataset.input_shape), 0), 0)
+        with tensorboard.file_writer.as_default():
+            tf.summary.trace_export(name="Test", step=0)
+
     best_loss = 1000
 
     for epoch in range(ModelConfig.MAX_EPOCHS):

@@ -48,12 +48,14 @@ class Trainer:
 
         return self.train_loss_metric.result(), self.train_acc_metric.result()
 
+    @tf.function
     def val_step(self, x, y_true):
-        y_pred = tf.convert_to_tensor(self.model.predict(x))
+        y_pred = self.model(x)
         loss = self.loss_fn(y_true, y_pred)
         self.val_loss_metric.update_state(loss)
         self.val_acc_metric.update_state(y_true, y_pred)
 
+    @tf.function
     def val_epoch(self):
         self.val_loss_metric.reset_states()
         self.val_acc_metric.reset_states()

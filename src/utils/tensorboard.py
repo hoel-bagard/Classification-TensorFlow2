@@ -7,7 +7,7 @@ import numpy as np
 
 
 class TensorBoard():
-    def __init__(self, model: tf.keras.Model, input_shape: tuple, tb_dir: str, max_outputs: int = 4):
+    def __init__(self, tb_dir: str, max_outputs: int = 4):
         """
         Args:
             model: Model used, it is used to create the TensorBoard graph
@@ -19,16 +19,6 @@ class TensorBoard():
 
         # tb_file_path = os.path.join(tb_dir, datetime.now().strftime("%Y%m%d-%H%M%S"))
         self.file_writer = tf.summary.create_file_writer(tb_dir)
-
-        # Creates the TensorBoard graph
-        # Result is not great, but it's a start. Ideally it should trace a whole training step
-        @tf.function
-        def trace_me(x):
-            return model(x)
-        tf.summary.trace_on(graph=True, profiler=False)
-        trace_me(tf.expand_dims(tf.zeros(input_shape), 0))
-        with self.file_writer.as_default():
-            tf.summary.trace_export(name="Test", step=0)
 
     def write_metrics(self, loss: float, acc: float, epoch: int, mode="Train"):
         """
