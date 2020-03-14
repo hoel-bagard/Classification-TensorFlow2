@@ -8,7 +8,9 @@ import tensorflow as tf
 from config.data_config import DataConfig
 from config.model_config import ModelConfig
 from src.dataset.mnist import MNISTDatasetCreator
-from src.network import CNN
+from src.networks.simple_cnn import CNN
+from src.networks.small_mobile_net import SmallMobileNet
+from src.networks.mobile_net import MobileNetV2
 from src.train import train
 
 
@@ -49,7 +51,14 @@ def main():
     mnist_dataset = MNISTDatasetCreator(DataConfig.DATA_PATH, batch_size=ModelConfig.BATCH_SIZE,
                                         cache=True, pickle=args.pickle)
 
-    model = CNN(mnist_dataset.input_shape, 10)
+    # model.build((None, *mnist_dataset.input_shape))
+
+    if ModelConfig.NETWORK_NAME == "CNN":
+        model = CNN(mnist_dataset.input_shape, 10)
+    elif ModelConfig.NETWORK_NAME == "SmallMobileNet":
+        model = SmallMobileNet(mnist_dataset.input_shape, 10)
+    elif ModelConfig.NETWORK_NAME == "MobileNetV2":
+        model = MobileNetV2(mnist_dataset.input_shape, 10)
     model.build((None, *mnist_dataset.input_shape))
 
     train(model, mnist_dataset)

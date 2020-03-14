@@ -43,10 +43,12 @@ def train(model: tf.keras.Model, dataset: MNISTDatasetCreator, max_epoch=50):
 
         # Validation
         if epoch % DataConfig.VAL_FREQ == 0 and epoch > DataConfig.RECORD_DELAY:
+            validation_start_time = time.time()
             val_loss, val_acc = trainer.val_epoch()
-            print(f"Validation loss: {val_loss}, Validation accuracy: {val_acc}", flush=True)
             if DataConfig.USE_TB:
                 tensorboard.write_metrics(train_loss, train_acc, epoch, mode="Validation")
                 imgs, labels = list(dataset.val_dataset.shuffle(500).take(1).as_numpy_iterator())[0]
                 predictions = model.predict(imgs)
                 tensorboard.write_predictions(imgs, predictions, epoch, mode="Validation")
+            print(f"\nValidation loss: {val_loss}, Validation accuracy: {val_acc}",
+                  f"-  Took {time.time() - validation_start_time:.5f}s", flush=True)

@@ -1,9 +1,12 @@
 import os
 import glob
 
+import cv2
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+
+from config.model_config import ModelConfig
 
 
 class MNISTDatasetCreator:
@@ -31,12 +34,12 @@ class MNISTDatasetCreator:
             imgs, labels = self._load_mnist(data_path, "Test")
         self.val_dataset = tf.data.Dataset.from_tensor_slices((imgs, labels))
         self.val_dataset = MNISTDatasetCreator._convert_image_dtype(self.val_dataset)
-        self.val_dataset = self.val_dataset.shuffle(self.train_dataset_size, reshuffle_each_iteration=True)
+        self.val_dataset = self.val_dataset.shuffle(self.val_dataset_size, reshuffle_each_iteration=True)
         self.val_dataset = self.val_dataset.batch(self.batch_size)
         print('Validation data loaded' + str(' ' * (os.get_terminal_size()[0] - 16)))
 
         if cache:
-            self.train_dataset = self.train_dataset.cache()  # speed things up considerably
+            self.train_dataset = self.train_dataset.cache()  # speed things up
             self.val_dataset = self.val_dataset.cache()
 
         print(f"Loaded {self.train_dataset_size} train data and {self.val_dataset_size} val data")
@@ -68,8 +71,9 @@ class MNISTDatasetCreator:
         for i in range(10):
             for entry in glob.glob(os.path.join(data_path, str(i), "*.png"), recursive=True):
                 print("Loading data {}".format(entry), end="\r")
-                image = Image.open(entry)
-                imgs.append(np.asarray(image))
+                img = np.asarray(Image.open(entry))
+                img = cv2.resize(img, (ModelConfig.IMG_SIZE, ModelConfig.IMG_SIZE), interpolation=cv2.INTER_AREA)
+                imgs.append(img)
                 labels.append(i)
 
         imgs = np.asarray(np.expand_dims(imgs, -1), dtype=np.float32)

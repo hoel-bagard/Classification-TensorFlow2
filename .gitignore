@@ -2,8 +2,5 @@
 __pycache__/
 *.py[cod]
 
-data.zip
-data
-output
-venv37
-venv36
+config/model_config.py
+config/data_config.py

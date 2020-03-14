@@ -1,7 +1,7 @@
 class DataConfig:
     # Training config
     DATA_PATH = '../data/'
-    USE_CHECKPOINT = True                    # Whether to save checkpoints or not
+    USE_CHECKPOINT = False                    # Whether to save checkpoints or not
     KEEP_CHECKPOINTS = False                          # Whether to remove the checkpoint dir
     CHECKPOINT_DIR = '../checkpoint/Test/'  # Path to checkpoint dir
     USE_TB = True                          # Whether generate a TensorBoard or not

@@ -21,7 +21,8 @@ class Trainer:
         self.val_loss_metric = tf.keras.metrics.Mean(name="val_loss")
         self.val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy(name="train_acc")
 
-        self.steps_per_epoch = dataset.train_dataset_size // dataset.batch_size
+        self.train_steps_per_epoch = dataset.train_dataset_size // dataset.batch_size
+        self.val_steps_per_epoch = dataset.val_dataset_size // dataset.batch_size
 
     @tf.function
     def train_step(self, x, y_true):
@@ -40,8 +41,8 @@ class Trainer:
             step_start_time = time.time()
             self.train_step(x_batch, y_batch)
 
-            epoch_progress = int(30 * (step/self.steps_per_epoch))
-            print(f"{step}/{self.steps_per_epoch} [" + epoch_progress*"=" + ">" +
+            epoch_progress = int(30 * (step/self.train_steps_per_epoch))
+            print(f"{step}/{self.train_steps_per_epoch} [" + epoch_progress*"=" + ">" +
                   (30-epoch_progress)*"." + f"] - loss: {self.train_loss_metric.result():.5f}  -  ",
                   f"Step time: {time.time() - step_start_time:.5f}s",
                   end='\r', flush=True)
@@ -55,10 +56,17 @@ class Trainer:
         self.val_loss_metric.update_state(loss)
         self.val_acc_metric.update_state(y_true, y_pred)
 
-    @tf.function
     def val_epoch(self):
         self.val_loss_metric.reset_states()
         self.val_acc_metric.reset_states()
-        for x, y in self.val_dataset:
-            self.val_step(x, y)
+        for step, (imgs_batch, labels_batch) in enumerate(self.val_dataset):
+            step_start_time = time.time()
+
+            self.val_step(imgs_batch, labels_batch)
+
+            epoch_progress = int(30 * (step/self.val_steps_per_epoch))
+            print(f"{step}/{self.val_steps_per_epoch} [" + epoch_progress*"=" + ">" +
+                  (30-epoch_progress)*"." + f"] - loss: {self.val_loss_metric.result():.5f}  -  ",
+                  f"Step time: {time.time() - step_start_time:.5f}s",
+                  end='\r', flush=True)
         return self.val_loss_metric.result(), self.val_acc_metric.result()
