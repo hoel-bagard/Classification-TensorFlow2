@@ -10,7 +10,7 @@ from src.utils.tensorboard import TensorBoard
 from src.utils.trainer import Trainer
 
 
-def train(model: tf.keras.Model, dataset: MNISTDatasetCreator, max_epoch=50):
+def train(model: tf.keras.Model, dataset: MNISTDatasetCreator):
     optimizer = tf.keras.optimizers.RMSprop(learning_rate=1e-3)
     loss_fn = tf.losses.SparseCategoricalCrossentropy(from_logits=False)
     trainer = Trainer(model, optimizer, loss_fn, dataset)
@@ -24,9 +24,10 @@ def train(model: tf.keras.Model, dataset: MNISTDatasetCreator, max_epoch=50):
             tf.summary.trace_export(name="Test", step=0)
 
     best_loss = 1000
+    last_checkpoint_epoch = 0
 
     for epoch in range(ModelConfig.MAX_EPOCHS):
-        print(f"\nEpoch {epoch}/{max_epoch}")
+        print(f"\nEpoch {epoch}/{ModelConfig.MAX_EPOCHS}")
         epoch_start_time = time.time()
 
         train_loss, train_acc = trainer.train_epoch()
@@ -35,9 +36,14 @@ def train(model: tf.keras.Model, dataset: MNISTDatasetCreator, max_epoch=50):
             tensorboard.write_metrics(train_loss, train_acc, epoch)
             tensorboard.write_lr(ModelConfig.LR, epoch)
 
-        if train_loss < best_loss and DataConfig.USE_CHECKPOINT and epoch >= DataConfig.RECORD_DELAY:
+        if (train_loss < best_loss and DataConfig.USE_CHECKPOINT and
+                epoch >= DataConfig.RECORD_DELAY and (epoch - last_checkpoint_epoch) > DataConfig.CHECKPT_SAVE_FREQ):
+
+            save_path = os.path.join(DataConfig.CHECKPOINT_DIR, f'train_{epoch}')
+            print(f"Loss improved from {best_loss} to {train_loss}, saving model to {save_path}")
             best_loss = train_loss
-            model.save(os.path.join(DataConfig.CHECKPOINT_DIR, f'train_{epoch}'))
+            last_checkpoint_epoch = epoch
+            model.save(save_path)
 
         print(f"\nEpoch loss: {train_loss}, Train accuracy: {train_acc}  -  Took {time.time() - epoch_start_time:.5f}s")
 

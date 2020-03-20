@@ -1,9 +1,10 @@
 # import os
 # from datetime import datetime
 
-import cv2
 import tensorflow as tf
 import numpy as np
+
+from src.utils.draw import draw_pred_mnist
 
 
 class TensorBoard():
@@ -52,13 +53,8 @@ class TensorBoard():
         """
         imgs = imgs[:self.max_outputs]
         predictions = predictions[:self.max_outputs]
-        new_imgs = []
-        for i, (img, preds) in enumerate(zip(imgs, predictions)):
-            img = cv2.resize(img, (480, 480), interpolation=cv2.INTER_AREA)
-            preds = str([round(float(conf), 2) for conf in preds]) + f"  ==> {np.argmax(preds)}"
-            new_imgs.append(cv2.putText(img, preds, (20, 20),
-                                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1, cv2.LINE_AA))
-        new_imgs = np.asarray(new_imgs)
+
+        new_imgs = draw_pred_mnist(imgs, predictions)
         new_imgs = np.expand_dims(new_imgs, -1)
         with self.file_writer.as_default():
             tf.summary.image(mode, new_imgs, max_outputs=self.max_outputs, step=epoch)
