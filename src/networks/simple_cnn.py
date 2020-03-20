@@ -1,19 +1,14 @@
 import tensorflow as tf
 
 
-class CNN(tf.keras.Model):
-    def __init__(self, input_shape, output_classes):
-        super().__init__()
-        self.network = tf.keras.Sequential([
-            tf.keras.layers.InputLayer(input_shape=input_shape),
-            tf.keras.layers.Conv2D(16, 3, strides=2, padding="same", activation="relu"),
-            tf.keras.layers.Conv2D(32, 3, strides=2, padding="same", activation="relu"),
-            tf.keras.layers.Conv2D(64, 3, strides=2, padding="same", activation="relu"),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.Dense(output_classes, activation="softmax")
-        ])
-
-    def call(self, inputs):
-        x = self.network(inputs)
-        return x
+def CNN(input_shape, output_classes):
+    # inputs = tf.keras.Input(shape=input_shape, name="InputLayer")
+    inputs = tf.keras.Input(shape=(28, 28, 1,), name="InputLayer")
+    # x = tf.keras.layers.InputLayer(input_shape=input_shape)(inputs)
+    x = tf.keras.layers.Conv2D(16, 3, strides=2, padding="same", activation="relu")(inputs)
+    x = tf.keras.layers.Conv2D(32, 3, strides=2, padding="same", activation="relu")(x)
+    x = tf.keras.layers.Conv2D(64, 3, strides=2, padding="same", activation="relu", name="LastConv")(x)
+    x = tf.keras.layers.Flatten()(x)
+    x = tf.keras.layers.Dropout(0.2)(x)
+    outputs = tf.keras.layers.Dense(output_classes, activation="softmax")(x)
+    return tf.keras.Model(inputs=inputs, outputs=outputs)

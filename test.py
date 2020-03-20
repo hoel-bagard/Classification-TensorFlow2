@@ -10,6 +10,7 @@ def main():
     parser.add_argument('checkpoint_path', help='Path to checkpoint to load')
     parser.add_argument('--output_dir', default='output',
                         help='Path to the output folder where the predictions will be saved')
+    parser.add_argument('--gradcam', action="store_true", help='Adds grad-CAM to the output')
     args = parser.parse_args()
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -22,7 +23,7 @@ def main():
             if file_name[-4:] == ".png":
                 test_files.append(os.path.join(root, file_name))
 
-    infer(test_files, args.checkpoint_path, args.output_dir, 16)
+    infer(test_files, args.checkpoint_path, args.output_dir, 16, args.gradcam)
 
 
 if __name__ == '__main__':

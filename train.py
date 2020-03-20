@@ -51,8 +51,6 @@ def main():
     mnist_dataset = MNISTDatasetCreator(DataConfig.DATA_PATH, batch_size=ModelConfig.BATCH_SIZE,
                                         cache=True, pickle=args.pickle)
 
-    # model.build((None, *mnist_dataset.input_shape))
-
     if ModelConfig.NETWORK_NAME == "CNN":
         model = CNN(mnist_dataset.input_shape, 10)
     elif ModelConfig.NETWORK_NAME == "SmallMobileNet":

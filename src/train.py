@@ -37,7 +37,7 @@ def train(model: tf.keras.Model, dataset: MNISTDatasetCreator):
             tensorboard.write_lr(ModelConfig.LR, epoch)
 
         if (train_loss < best_loss and DataConfig.USE_CHECKPOINT and
-                epoch >= DataConfig.RECORD_DELAY and (epoch - last_checkpoint_epoch) > DataConfig.CHECKPT_SAVE_FREQ):
+                epoch >= DataConfig.RECORD_DELAY and (epoch - last_checkpoint_epoch) >= DataConfig.CHECKPT_SAVE_FREQ):
 
             save_path = os.path.join(DataConfig.CHECKPOINT_DIR, f'train_{epoch}')
             print(f"Loss improved from {best_loss} to {train_loss}, saving model to {save_path}")
