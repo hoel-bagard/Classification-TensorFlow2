@@ -4,7 +4,7 @@
 import tensorflow as tf
 import numpy as np
 
-from src.utils.draw import draw_pred_mnist
+from src.utils.draw import draw_pred
 
 
 class TensorBoard():
@@ -51,11 +51,13 @@ class TensorBoard():
             epoch: Current epoch
             mode: Either "Train" or "Validation"
         """
-        imgs = imgs[:self.max_outputs]
+        imgs = np.asarray(imgs[:self.max_outputs], dtype=np.uint8)
         predictions = predictions[:self.max_outputs]
 
-        new_imgs = draw_pred_mnist(imgs, predictions)
-        new_imgs = np.expand_dims(new_imgs, -1)
+        new_imgs = draw_pred(imgs, predictions)
+        # MNIST is black and white
+        if new_imgs.shape[-1] != 3:
+            new_imgs = np.expand_dims(new_imgs, -1)
         with self.file_writer.as_default():
             tf.summary.image(mode, new_imgs, max_outputs=self.max_outputs, step=epoch)
             self.file_writer.flush()

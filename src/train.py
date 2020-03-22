@@ -3,14 +3,14 @@ import os
 
 import tensorflow as tf
 
-from src.dataset.mnist import MNISTDatasetCreator
+from src.dataset.dataset_creator import DatasetCreator
 from config.data_config import DataConfig
 from config.model_config import ModelConfig
 from src.utils.tensorboard import TensorBoard
 from src.utils.trainer import Trainer
 
 
-def train(model: tf.keras.Model, dataset: MNISTDatasetCreator):
+def train(model: tf.keras.Model, dataset: DatasetCreator):
     optimizer = tf.keras.optimizers.RMSprop(learning_rate=1e-3)
     loss_fn = tf.losses.SparseCategoricalCrossentropy(from_logits=False)
     trainer = Trainer(model, optimizer, loss_fn, dataset)

@@ -7,7 +7,7 @@ import tensorflow as tf
 
 from config.data_config import DataConfig
 from config.model_config import ModelConfig
-from src.dataset.mnist import MNISTDatasetCreator
+from src.dataset.dataset_creator import DatasetCreator
 from src.networks.simple_cnn import CNN
 from src.networks.small_mobile_net import SmallMobileNet
 from src.networks.mobile_net import MobileNetV2
@@ -48,18 +48,18 @@ def main():
             shutil.copy(misc_file, os.path.join(output_folder, misc_file))
         print("Finished copying files")
 
-    mnist_dataset = MNISTDatasetCreator(DataConfig.DATA_PATH, batch_size=ModelConfig.BATCH_SIZE,
-                                        cache=True, pickle=args.pickle)
+    dataset = DatasetCreator(DataConfig.DATA_PATH, DataConfig.DATASET, batch_size=ModelConfig.BATCH_SIZE,
+                             cache=True, pickle=args.pickle)
 
     if ModelConfig.NETWORK_NAME == "CNN":
-        model = CNN(mnist_dataset.input_shape, 10)
+        model = CNN(dataset.input_shape, dataset.classes_nb)
     elif ModelConfig.NETWORK_NAME == "SmallMobileNet":
-        model = SmallMobileNet(mnist_dataset.input_shape, 10)
+        model = SmallMobileNet(dataset.input_shape, dataset.classes_nb)
     elif ModelConfig.NETWORK_NAME == "MobileNetV2":
-        model = MobileNetV2(mnist_dataset.input_shape, 10)
-    model.build((None, *mnist_dataset.input_shape))
+        model = MobileNetV2(dataset.input_shape, dataset.classes_nb)
+    model.build((None, *dataset.input_shape))
 
-    train(model, mnist_dataset)
+    train(model, dataset)
 
 
 if __name__ == "__main__":

@@ -2,11 +2,11 @@ import time
 
 import tensorflow as tf
 
-from src.dataset.mnist import MNISTDatasetCreator
+from src.dataset.dataset_creator import DatasetCreator
 
 
 class Trainer:
-    def __init__(self, model, optimizer, loss_fn, dataset: MNISTDatasetCreator):
+    def __init__(self, model, optimizer, loss_fn, dataset: DatasetCreator):
         self.model = model
         self.loss_fn = loss_fn
         self.optimizer = optimizer

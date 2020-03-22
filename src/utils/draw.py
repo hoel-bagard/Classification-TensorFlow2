@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def draw_pred_mnist(imgs: np.ndarray, predictions: np.ndarray):
+def draw_pred(imgs: np.ndarray, predictions: np.ndarray):
     new_imgs = []
     for img, preds in zip(imgs, predictions):
         img = cv2.resize(img, (480, 480), interpolation=cv2.INTER_AREA)
