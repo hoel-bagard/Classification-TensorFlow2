@@ -43,7 +43,8 @@ class TensorBoard():
             tf.summary.scalar("Learning Rate", lr, step=epoch)
             self.file_writer.flush()
 
-    def write_predictions(self, imgs, predictions, epoch: int, mode="Train"):
+    def write_predictions(self, imgs: np.ndarray, predictions: np.ndarray, labels: np.ndarray,
+                          epoch: int, mode="Train"):
         """
         Args:
             imgs: images that have been fed to the network
@@ -53,8 +54,9 @@ class TensorBoard():
         """
         imgs = np.asarray(imgs[:self.max_outputs], dtype=np.uint8)
         predictions = predictions[:self.max_outputs]
+        labels = labels[:self.max_outputs]
 
-        new_imgs = draw_pred(imgs, predictions)
+        new_imgs = draw_pred(imgs, predictions, labels)
         # MNIST is black and white
         if new_imgs.shape[-1] != 3:
             new_imgs = np.expand_dims(new_imgs, -1)

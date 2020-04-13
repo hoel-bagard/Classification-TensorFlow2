@@ -11,7 +11,7 @@ from src.utils.trainer import Trainer
 
 
 def train(model: tf.keras.Model, dataset: DatasetCreator):
-    optimizer = tf.keras.optimizers.RMSprop(learning_rate=1e-3)
+    optimizer = tf.keras.optimizers.RMSprop(learning_rate=ModelConfig.LR)
     loss_fn = tf.losses.SparseCategoricalCrossentropy(from_logits=False)
     trainer = Trainer(model, optimizer, loss_fn, dataset)
 
@@ -21,7 +21,7 @@ def train(model: tf.keras.Model, dataset: DatasetCreator):
         tf.summary.trace_on(graph=True, profiler=False)
         trainer.val_step(tf.expand_dims(tf.zeros(dataset.input_shape), 0), 0)
         with tensorboard.file_writer.as_default():
-            tf.summary.trace_export(name="Test", step=0)
+            tf.summary.trace_export(name=ModelConfig.NETWORK_NAME, step=0)
 
     best_loss = 1000
     last_checkpoint_epoch = 0
@@ -47,14 +47,23 @@ def train(model: tf.keras.Model, dataset: DatasetCreator):
 
         print(f"\nEpoch loss: {train_loss}, Train accuracy: {train_acc}  -  Took {time.time() - epoch_start_time:.5f}s")
 
-        # Validation
+        # Validation and (expensive to compute) metrics
         if epoch % DataConfig.VAL_FREQ == 0 and epoch > DataConfig.RECORD_DELAY:
             validation_start_time = time.time()
             val_loss, val_acc = trainer.val_epoch()
+
             if DataConfig.USE_TB:
-                tensorboard.write_metrics(train_loss, train_acc, epoch, mode="Validation")
-                imgs, labels = list(dataset.val_dataset.shuffle(500).take(1).as_numpy_iterator())[0]
+                tensorboard.write_metrics(val_loss, val_acc, epoch, mode="Validation")
+
+                # Metrics for the Train dataset
+                imgs, labels = list(dataset.train_dataset.take(1).as_numpy_iterator())[0]
                 predictions = model.predict(imgs)
-                tensorboard.write_predictions(imgs, predictions, epoch, mode="Validation")
+                tensorboard.write_predictions(imgs, predictions, labels, epoch, mode="Train")
+
+                # Metrics for the Validation dataset
+                imgs, labels = list(dataset.val_dataset.take(1).as_numpy_iterator())[0]
+                predictions = model.predict(imgs)
+                tensorboard.write_predictions(imgs, predictions, labels, epoch, mode="Validation")
+
             print(f"\nValidation loss: {val_loss}, Validation accuracy: {val_acc}",
                   f"-  Took {time.time() - validation_start_time:.5f}s", flush=True)
