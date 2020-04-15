@@ -17,15 +17,17 @@ class DatasetCreator:
         self.batch_size: int = batch_size
         self.input_shape: int
         self.classes_nb: int
-        data_path = os.path.join(data_path, dataset_name)
+        data_path: str = os.path.join(data_path, dataset_name)
 
         if dataset_name == "MNIST" or dataset_name == "Fashion-MNIST":
             self.classes_nb = 10
         elif dataset_name == "CatVsDog":
             self.classes_nb = 2
+        else:
+            print("Wrong dataset name")
+            exit()
 
         # Prepare the training dataset.
-        self.train_dataset_size: int
         if pickle:
             imgs, labels = self._load_pickle(data_path, dataset_name, "Train")
         else:
@@ -35,11 +37,8 @@ class DatasetCreator:
                 imgs, labels = load_fashion_mnist(data_path, "Train")
             elif dataset_name == "CatVsDog":
                 imgs, labels = load_cat_vs_dog(data_path, "Train")
-            else:
-                print("Wrong dataset name")
-                return
         self.input_shape = imgs.shape[1:]
-        self.train_dataset_size = len(labels)
+        self.train_dataset_size: int = len(labels)
 
         self.train_dataset = tf.data.Dataset.from_tensor_slices((imgs, labels))
         self.train_dataset = DatasetCreator._convert_image_dtype(self.train_dataset)  # Convert to float range
@@ -48,7 +47,6 @@ class DatasetCreator:
         print('Train data loaded' + str(' ' * (os.get_terminal_size()[0] - 17)))
 
         # Prepare the validation dataset.
-        self.val_dataset_size: int
         if pickle:
             imgs, labels = self._load_pickle(data_path, dataset_name, "Validation")
         else:
@@ -58,10 +56,7 @@ class DatasetCreator:
                 imgs, labels = load_fashion_mnist(data_path, "Validation")
             elif dataset_name == "CatVsDog":
                 imgs, labels = load_cat_vs_dog(data_path, "Validation")
-            else:
-                print("Wrong dataset name")
-                return
-        self.val_dataset_size = len(labels)
+        self.val_dataset_size: int = len(labels)
 
         self.val_dataset = tf.data.Dataset.from_tensor_slices((imgs, labels))
         self.val_dataset = DatasetCreator._convert_image_dtype(self.val_dataset)

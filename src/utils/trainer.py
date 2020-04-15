@@ -37,9 +37,9 @@ class Trainer:
     def train_epoch(self):
         self.train_loss_metric.reset_states()
         self.train_acc_metric.reset_states()
-        for step, (x_batch, y_batch) in enumerate(self.train_dataset):
+        for step, (imgs_batch, labels_batch) in enumerate(self.train_dataset, start=1):
             step_start_time = time.time()
-            self.train_step(x_batch, y_batch)
+            self.train_step(imgs_batch, labels_batch)
 
             epoch_progress = int(30 * (step/self.train_steps_per_epoch))
             print(f"{step}/{self.train_steps_per_epoch} [" + epoch_progress*"=" + ">" +
@@ -59,7 +59,7 @@ class Trainer:
     def val_epoch(self):
         self.val_loss_metric.reset_states()
         self.val_acc_metric.reset_states()
-        for step, (imgs_batch, labels_batch) in enumerate(self.val_dataset):
+        for step, (imgs_batch, labels_batch) in enumerate(self.val_dataset, start=1):
             step_start_time = time.time()
 
             self.val_step(imgs_batch, labels_batch)
