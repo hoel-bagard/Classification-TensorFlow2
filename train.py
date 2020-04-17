@@ -8,7 +8,7 @@ import tensorflow as tf
 from config.data_config import DataConfig
 from config.model_config import ModelConfig
 from src.dataset.dataset_creator import DatasetCreator
-from src.networks.simple_cnn import CNN
+from src.networks.cnn import CNN
 from src.networks.small_mobile_net import SmallMobileNet
 from src.networks.mobile_net import MobileNetV2
 from src.train import train
@@ -49,7 +49,7 @@ def main():
         print("Finished copying files")
 
     dataset = DatasetCreator(DataConfig.DATA_PATH, DataConfig.DATASET, batch_size=ModelConfig.BATCH_SIZE,
-                             cache=True, pickle=args.pickle)
+                             cache=False, pickle=args.pickle)
 
     if ModelConfig.NETWORK_NAME == "CNN":
         model = CNN(dataset.input_shape, dataset.classes_nb)
@@ -58,6 +58,8 @@ def main():
     elif ModelConfig.NETWORK_NAME == "MobileNetV2":
         model = MobileNetV2(dataset.input_shape, dataset.classes_nb)
     model.build((None, *dataset.input_shape))
+
+    print(model.summary())
 
     train(model, dataset)
 

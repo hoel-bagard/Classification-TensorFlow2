@@ -3,7 +3,6 @@ import os
 
 import cv2
 import numpy as np
-from PIL import Image
 
 from config.model_config import ModelConfig
 
@@ -17,21 +16,18 @@ def load_cat_vs_dog(data_path: str, mode: str) -> (np.ndarray, np.ndarray):
     data_path = os.path.join(data_path, mode)
     imgs = []
     labels = []
-    for entry in glob.glob(os.path.join(data_path, "*.jpg")):
-        print("Loading data {}   ".format(entry), end="\r")
-        img = np.asarray(Image.open(entry))
+    for image_path in glob.glob(os.path.join(data_path, "*.jpg")):
+        print("Loading data {}   ".format(image_path), end="\r")
+        img = cv2.imread(image_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if ModelConfig.IMG_SIZE:
             img = cv2.resize(img, (ModelConfig.IMG_SIZE, ModelConfig.IMG_SIZE), interpolation=cv2.INTER_AREA)
         imgs.append(img)
-        file_name = os.path.basename(entry)
-        if file_name[:3] == "cat":
-            labels.append(0)
-        elif file_name[:3] == "dog":
-            labels.append(1)
-        else:
-            print(f"Wrong file name: {file_name}")
 
-    imgs = np.asarray(imgs, dtype=np.float32)
+        file_name = os.path.basename(image_path)
+        labels.append(0 if "cat" in file_name else 1)
+
+    imgs = np.asarray(imgs, dtype=np.uint8)
     labels = np.asarray(labels, dtype=np.uint8)
 
     return imgs, labels

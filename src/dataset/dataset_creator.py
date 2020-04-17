@@ -6,10 +6,12 @@ import numpy as np
 from src.dataset.mnist import load_mnist
 from src.dataset.cat_vs_dog import load_cat_vs_dog
 from src.dataset.fashion_mnist import load_fashion_mnist
+from src.dataset.data_augmentation import color_augment
 
 
 class DatasetCreator:
-    def __init__(self, data_path: str, dataset_name: str, batch_size: int, cache: bool = True, pickle: bool = True):
+    def __init__(self, data_path: str, dataset_name: str, batch_size: int,
+                 cache: bool = True, pickle: bool = True, use_data_augmentation: bool = True):
         """ Creates desired dataset.
         Args:
             dataset_name: Either MNIST or CatVsDog
@@ -42,7 +44,10 @@ class DatasetCreator:
 
         self.train_dataset = tf.data.Dataset.from_tensor_slices((imgs, labels))
         self.train_dataset = DatasetCreator._convert_image_dtype(self.train_dataset)  # Convert to float range
-        self.train_dataset = self.train_dataset.shuffle(self.train_dataset_size, reshuffle_each_iteration=True)
+        if use_data_augmentation:
+            self.train_dataset = self.train_dataset.map(color_augment)
+            self.train_dataset = self.train_dataset.map(lambda x, y: (tf.image.random_flip_left_right(x), y))
+        self.train_dataset = self.train_dataset.shuffle(self.train_dataset_size, reshuffle_each_iteration=False)
         self.train_dataset = self.train_dataset.batch(self.batch_size)
         print('Train data loaded' + str(' ' * (os.get_terminal_size()[0] - 17)))
 

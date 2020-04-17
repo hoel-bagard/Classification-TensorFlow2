@@ -4,6 +4,7 @@ from tensorflow.keras.layers import (
     Conv2D,
     DepthwiseConv2D,
 )
+from config.model_config import ModelConfig
 
 
 class InvertedResidual(tf.keras.layers.Layer):
@@ -18,10 +19,13 @@ class InvertedResidual(tf.keras.layers.Layer):
     def build(self, input_shape):
         input_channels = int(input_shape[3])
         self.ptwise_conv1 = Conv2D(filters=int(input_channels*self.expansion_factor),
-                                   kernel_size=1, use_bias=False)
+                                   kernel_size=1, use_bias=False,
+                                   kernel_regularizer=tf.keras.regularizers.l2(ModelConfig.REG_FACTOR))
         self.dwise = DepthwiseConv2D(kernel_size=3, strides=self.strides,
-                                     padding='same', use_bias=False)
-        self.ptwise_conv2 = Conv2D(filters=self.filters, kernel_size=1, use_bias=False)
+                                     padding='same', use_bias=False,
+                                     kernel_regularizer=tf.keras.regularizers.l2(ModelConfig.REG_FACTOR))
+        self.ptwise_conv2 = Conv2D(filters=self.filters, kernel_size=1, use_bias=False,
+                                   kernel_regularizer=tf.keras.regularizers.l2(ModelConfig.REG_FACTOR))
 
         self.bn1 = BatchNormalization()
         self.bn2 = BatchNormalization()

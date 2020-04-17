@@ -52,7 +52,7 @@ class TensorBoard():
             epoch: Current epoch
             mode: Either "Train" or "Validation"
         """
-        imgs = np.asarray(imgs[:self.max_outputs], dtype=np.uint8)
+        imgs = imgs[:self.max_outputs]
         predictions = predictions[:self.max_outputs]
         labels = labels[:self.max_outputs]
 

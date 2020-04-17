@@ -33,7 +33,7 @@ def infer(input_files, checkpoint_path: str, output_dir: str, batch_size: int, u
     for i, imgs_batch in enumerate(imgs):
         print(f"Computing predictions for batch {i}")
         if use_gradcam:
-            grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(name="Conv3", index=-4).output, model.output])
+            grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(index=-5).output, model.output])
             # conv_outputs, predictions = grad_model.predict_on_batch(imgs_batch)
 
             # Get the score for target class
@@ -81,7 +81,8 @@ def infer(input_files, checkpoint_path: str, output_dir: str, batch_size: int, u
                 heatmap = (cam - cam.min()) / (cam.max() - cam.min())
 
                 cam = cv2.applyColorMap(np.uint8(255*heatmap), cv2.COLORMAP_JET)
-                output_image = cv2.addWeighted(cv2.cvtColor(imgs_batch[j].astype('uint8'), cv2.COLOR_RGB2BGR), 0.5, cam, 1, 0)
+                input_image = cv2.cvtColor(imgs_batch[j].astype('uint8'), cv2.COLOR_RGB2BGR)
+                output_image = cv2.addWeighted(input_image, 0.5, cam, 1, 0)
                 cv2.imwrite(os.path.join(output_dir, f"prediction_{i}_{j}.png"), output_image)
 
         else:

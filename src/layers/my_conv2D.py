@@ -4,6 +4,7 @@ from tensorflow.keras.layers import (
     Conv2D,
     ReLU,
 )
+from config.model_config import ModelConfig
 
 
 class MyConv2D(tf.keras.layers.Layer):
@@ -19,6 +20,7 @@ class MyConv2D(tf.keras.layers.Layer):
                              kernel_size=self.kernel_size,
                              strides=self.strides,
                              padding=self.padding,
+                             kernel_regularizer=tf.keras.regularizers.l2(ModelConfig.REG_FACTOR),
                              activation=None)
         self.bn = BatchNormalization()
         self.relu6 = ReLU(max_value=6, negative_slope=0.1)
