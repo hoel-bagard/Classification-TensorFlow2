@@ -81,7 +81,8 @@ def infer(input_files, checkpoint_path: str, output_dir: str, batch_size: int, u
                 heatmap = (cam - cam.min()) / (cam.max() - cam.min())
 
                 cam = cv2.applyColorMap(np.uint8(255*heatmap), cv2.COLORMAP_JET)
-                input_image = cv2.cvtColor(imgs_batch[j].astype('uint8'), cv2.COLOR_RGB2BGR)
+                # input_image = cv2.cvtColor(imgs_batch[j].astype('uint8'), cv2.COLOR_RGB2BGR)
+                input_image = imgs_batch[j].astype('uint8')
                 output_image = cv2.addWeighted(input_image, 0.5, cam, 1, 0)
                 cv2.imwrite(os.path.join(output_dir, f"prediction_{i}_{j}.png"), output_image)
 
